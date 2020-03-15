@@ -94,7 +94,7 @@ function PremiumWrapper:BindExclusiveDoor(Door)
     PhysicsService:CreateCollisionGroup(DoorKey);
 
     if (Door:IsA("Model")) then
-        for _, Part in ipairs(Model:GetDescendants()) do
+        for _, Part in ipairs(Door:GetDescendants()) do
             Part.CanCollide = true;
             PhysicsService:SetPartCollisionGroup(Part, DoorKey);
         end
