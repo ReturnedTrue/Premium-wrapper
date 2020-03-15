@@ -126,3 +126,5 @@ function PremiumWrapper:BindExclusiveDoor(Door)
     self:BindOnJoin(SetupDoor);
     self:BindOnChange(SetupDoor);
 end
+
+return PremiumWrapper
