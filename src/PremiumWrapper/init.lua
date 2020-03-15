@@ -24,8 +24,17 @@ function PremiumWrapper.Init()
         end
     end
     
-    Players.PlayerAdded:Connect(PlayerAdded);
+    local function PlayerChanged(Player)
+        if (self:PlayerIsPremium(Player)) then
+            for _, Function in ipairs(self.BindedFunctionsOnChange) do
+                Function(Player)
+            end
+        end
+    end
+
     table.foreach(Players:GetPlayers(), PlayerAdded);
+    Players.PlayerAdded:Connect(PlayerAdded);
+    Players.PlayerMembershipChanged:Connect(PlayerChanged);
 
     return self;
 end
@@ -40,9 +49,31 @@ function PremiumWrapper:PlayerIsPremium(Player)
     elseif (not typeof(Player) == "Instance") then
         error("Expected Player, got " .. typeof(Player));
     elseif (not Player:IsA("Player")) then
-        error("Expected Player, got ", Player.ClassName);
+        error("Expected Player, got " .. Player.ClassName);
     end
 
-    return Player.MembershipType == Enum.MembershipType.Premium
+    return Player.MembershipType == Enum.MembershipType.Premium;
 end
 
+function PremiumWrapper:BindOnJoin(Function)
+    assert(typeof(Function) == "function", "Expected function, got " .. typeof(Function));
+    
+    table.insert(self.BindedFunctionsOnJoin, Function);
+end
+
+function PremiumWrapper:BindOnChange(Function)
+    assert(typeof(Function) == "function", "Expected function, got " .. typeof(Function));
+    
+    table.insert(self.BindedFunctionsOnChange, Function);
+end
+
+function PremiumWrapper:BindExclusiveTool(Tool)
+    local function GiveTool(Player)
+        local Clone1, Clone2 = Tool:Clone(), Tool:Clone();
+        Clone1.Parent = Player.Backpack
+        Clone2.Parent = Player.StarterGear
+    end
+
+    self:BindOnJoin(GiveTool)
+    self:BindOnChange(GiveTool)
+end
