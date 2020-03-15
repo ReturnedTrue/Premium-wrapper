@@ -5,7 +5,7 @@
     "ServerScriptService": {
       "$className": "ServerScriptService",
       "Source" : {
-        "$src" : "src"
+        "$path" : "src"
       }
     },
     "HttpService": {
