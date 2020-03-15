@@ -4,6 +4,11 @@
 --// Dependencies
 local Players = game:GetService("Players");
 local RunService = game:GetService("RunService");
+local PhysicsService = game:GetService("PhysicsService");
+
+--// Cosntants
+local PLAYER_COLLISION_GROUP_NAME = "%s_COLLISION_GROUP";
+local DOOR_COLLISION_GROUP_NAME = "%s_DOOR_COLLISION_GROUP";
 
 --// Class
 local PremiumWrapper = {};
@@ -68,12 +73,56 @@ function PremiumWrapper:BindOnChange(Function)
 end
 
 function PremiumWrapper:BindExclusiveTool(Tool)
+    assert(typeof(Tool) == "Instance", "Expected Tool, got " .. typeof(Tool));
+    assert(Tool:IsA("Tool"), "Expected Tool, got " .. Tool.ClassName);
+
     local function GiveTool(Player)
         local Clone1, Clone2 = Tool:Clone(), Tool:Clone();
-        Clone1.Parent = Player.Backpack
-        Clone2.Parent = Player.StarterGear
+        Clone1.Parent = Player.Backpack;
+        Clone2.Parent = Player.StarterGear;
     end
 
-    self:BindOnJoin(GiveTool)
-    self:BindOnChange(GiveTool)
+    self:BindOnJoin(GiveTool);
+    self:BindOnChange(GiveTool);
+end
+
+function PremiumWrapper:BindExclusiveDoor(Door)
+    assert(typeof(Door), "Expected Model or BasePart, got " .. typeof(Door));
+    assert(Door:IsA("Model") or Door:IsA("BasePart"), "Expected Model or BasePart, got " .. Door.ClassName);
+
+    local DoorKey = string.format(DOOR_COLLISION_GROUP_NAME, Door.Name);
+    PhysicsService:CreateCollisionGroup(DoorKey);
+
+    if (Door:IsA("Model")) then
+        for _, Part in ipairs(Model:GetDescendants()) do
+            Part.CanCollide = true;
+            PhysicsService:SetPartCollisionGroup(Part, DoorKey);
+        end
+    else
+        Door.CanCollide = true;
+        PhysicsService:SetPartCollisionGroup(Door, DoorKey);
+    end
+
+    local function SetupDoor(Player)
+        local PlayerKey = string.format(PLAYER_COLLISION_GROUP_NAME, Player.Name);
+        PhysicsService:CreateCollisionGroup(PlayerKey);
+        PhysicsService:CollisionGroupSetCollidable(DoorKey, PlayerKey, false);
+
+        local function CharacterAppearanceLoaded(Character)
+            for _, Part in ipairs(Character:GetDescendants()) do
+                if (Part:IsA("BasePart")) then
+                    PhysicsService:SetPartCollisionGroup(Part, PlayerKey);
+                end
+            end
+        end
+        
+        if (Player.Character) then
+            CharacterAppearanceLoaded(Player.Character);
+        end
+
+        Player.CharacterAppearanceLoaded:Connect(CharacterAppearanceLoaded);
+    end
+
+    self:BindOnJoin(SetupDoor);
+    self:BindOnChange(SetupDoor);
 end
