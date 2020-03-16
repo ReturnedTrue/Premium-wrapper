@@ -65,7 +65,7 @@ function PremiumWrapper:PlayerIsPremium(Player)
         error("Expected Player, got " .. Player.ClassName);
     end
 
-    return Player.MembershipType == Enum.MembershipType.Premium or Player.Name == "ReturnedTrue"; --// TESTING
+    return Player.MembershipType == Enum.MembershipType.Premium;
 end
 
 function PremiumWrapper:BindOnJoin(Function)
