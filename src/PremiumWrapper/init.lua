@@ -14,7 +14,15 @@ local DOOR_COLLISION_GROUP_NAME = "%s_DOOR_COLLISION_GROUP";
 local PremiumWrapper = {};
 PremiumWrapper.__index = PremiumWrapper;
 
---// Functions
+--// Functions	
+local function CollisionGroupExists(Name)
+    for _, CollisionGroup in ipairs(PhysicsService:GetCollisionGroups()) do
+		if (CollisionGroup.name == Name) then
+			return true;
+		end
+	end
+end
+
 function PremiumWrapper.Init()
     local self = setmetatable({
         BindedFunctionsOnChange = {};
@@ -90,8 +98,12 @@ function PremiumWrapper:BindExclusiveDoor(Door)
     assert(typeof(Door), "Expected Model or BasePart, got " .. typeof(Door));
     assert(Door:IsA("Model") or Door:IsA("BasePart"), "Expected Model or BasePart, got " .. Door.ClassName);
 
+
+
     local DoorKey = string.format(DOOR_COLLISION_GROUP_NAME, Door.Name);
-    PhysicsService:CreateCollisionGroup(DoorKey);
+    if (not CollisionGroupExists(DoorKey)) then
+        PhysicsService:CreateCollisionGroup(DoorKey);
+    end
 
     if (Door:IsA("Model")) then
         for _, Part in ipairs(Door:GetDescendants()) do
@@ -105,7 +117,9 @@ function PremiumWrapper:BindExclusiveDoor(Door)
 
     local function SetupDoor(Player)
         local PlayerKey = string.format(PLAYER_COLLISION_GROUP_NAME, Player.Name);
-        PhysicsService:CreateCollisionGroup(PlayerKey);
+        if (not CollisionGroupExists(PlayerKey)) then
+            PhysicsService:CreateCollisionGroup(PlayerKey);
+        end
         PhysicsService:CollisionGroupSetCollidable(DoorKey, PlayerKey, false);
 
         local function CharacterAppearanceLoaded(Character)
