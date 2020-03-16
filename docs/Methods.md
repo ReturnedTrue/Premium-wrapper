@@ -36,9 +36,99 @@ end
 ```
 
 #### **Arguments**
-- Player [Instance:Player] {Required}
+- Player to check [Instance:Player]
 
-#### **Returns**
+#### **Returned**
 - If they are a Premium user [boolean]
+
+<!-- tabs:end -->
+
+# BindOnJoin
+
+<!-- tabs:start -->
+
+#### **Description**
+Binds a function to run when a Player who's Premium joins.
+
+#### **Code Example**
+```lua
+local function PremiumPlayerJoined(Player)
+    print(Player, "joined who is a Premium user.")
+end
+
+PremiumWrapper:BindOnJoin(PremiumPlayerJoined)
+```
+
+#### **Arguments**
+- Function to bind [function]
+
+#### **Returned**
+- Nothing returned.
+
+<!-- tabs:end -->
+
+# BindOnChange
+!> This only runs the binded function __when a Player changes Membership to Premium__, please use BindOnJoin for when a Premium user joins.
+
+<!-- tabs:start -->
+
+#### **Description**
+Binds a function to run when a Player Membership changes to Premium.
+
+#### **Code Example**
+```lua
+local function PlayerChanged(Player)
+    print(Player .. "'s Membership changed and is now a Premium user,")
+end
+
+PremiumWrapper:BindOnChange(PlayerChanged)
+```
+
+#### **Arguments**
+- Function to bind [function]
+
+#### **Returned**
+- Nothing returned.
+
+<!-- tabs:end -->
+
+# BindExclusiveTool
+
+<!-- tabs:start -->
+
+#### **Description**
+Binds an exclusive Tool given to Premium users.
+
+#### **Code Example**
+```lua
+PremiumWrapper:BindExclusiveTool(workspace.Tool)
+```
+
+#### **Arguments**
+- Tool to bind [Instance:Tool]
+
+#### **Returned**
+- Nothing returned.
+
+<!-- tabs:end -->
+
+# BindExclusiveDoor
+!> Due to replication, this only affects Collisions and not Transparency.
+
+<!-- tabs:start -->
+
+#### **Description**
+Binds a door which a Premium user can walk through.
+
+#### **Code Example**
+```lua
+PremiumWrapper:BindExclusiveDoor(workspace.Door)
+```
+
+#### **Arguments**
+- Door to bind [Instance:BasePart | Instance:Model]
+
+#### **Returned**
+- Nothing returned.
 
 <!-- tabs:end -->
